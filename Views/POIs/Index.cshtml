@@ -1,0 +1,236 @@
+﻿
+@using Mapa.Models;
+@model IEnumerable<Mapa.Models.POI>
+
+@{
+	ViewData["Title"] = "Points of Interest";
+
+	POIsQuery query = ViewData["Query"] as POIsQuery;
+	string order = query.Order;
+	double total = Convert.ToDouble(query.Total);
+	int pageSize = query.Size;
+	int currentPage = query.Page;
+	var pageLimit = Math.Ceiling(total / pageSize);
+}
+
+<h2>POIs</h2>
+
+<div class="row">
+	<!-- <div class="col-md-12">
+		<form method="post" enctype="multipart/form-data" asp-controller="UploadFiles" asp-action="Index">
+			<div class="form-group">
+				<div class="col-md-10">
+					<p>Upload</p>
+					<input type="file" name="file" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-md-10">
+					<input type="submit" value="Upload" />
+				</div>
+			</div>
+		</form>
+	</div> -->
+	<div class="col-md-6">
+		<form class="form-inline" method="GET" action="@Html.Raw(Url.RouteUrl("Index") + query.GetUrl())">
+			<div class="form-group">
+				<input type="text" class="form-control" name="Keywords" placeholder="Buscar...">
+			</div>
+			<button type="submit" class="btn btn-primary">Buscar</button>
+		</form>
+	</div>
+	<div class="col-md-6 text-right">
+		<p>
+			<!-- <a asp-action="Create" class="btn btn-primary">Criar</a> -->
+			@if (total > 0)
+			{
+				var qry = query.Clone();
+				qry.Page = currentPage - 1;
+				<a class="btn btn-primary @(currentPage == 1 ? "disabled" : "")" href="@(Url.RouteUrl("Index") + qry.GetUrl())"><i class="glyphicon glyphicon-chevron-left"></i></a>
+				int count = 7;
+				@for (var x = 1; x < pageLimit + 1; x++)
+				{
+					qry = query.Clone();
+					qry.Page = x;
+					if (count == 0) { break; }
+					if (count == 4)
+					{
+						<a class="btn btn-primary">...</a>
+						x = (int)pageLimit - count + 1;
+						count--;
+						continue;
+					}
+					<a class="btn btn-primary @((currentPage == x) ? "active" : "")" href="@(Url.RouteUrl("Index") + qry.GetUrl())">@x</a>
+					count--;
+				}
+				qry = query.Clone();
+				qry.Page = currentPage + 1;
+				<a class="btn btn-primary @(currentPage == pageLimit ? "disabled" : "")" href="@(Url.RouteUrl("Index") + qry.GetUrl())"><i class="glyphicon glyphicon-chevron-right"></i></a>
+			}
+		</p>
+	</div>
+	<div class="col-md-12">
+		@if (Model.Count() > 0)
+		{
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>@Html.DisplayNameFor(model => model.Id)</th>
+						<th>Sobre a Startup</th>
+						<th>Informações de Contato</th>
+						<th>@Html.DisplayNameFor(model => model.Tags)</th>
+						<th>@Html.DisplayNameFor(model => model.Address)</th>
+						<th>@Html.DisplayNameFor(model => model.FoundationDate)</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>@Html.DisplayFor(model => item.Id)</td>
+							<td>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Name)</b><br />
+									@Html.DisplayFor(model => item.Name)
+								</p>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Logo)</b><br />
+									<img style="max-width: 200px;margin: auto;width: 100%;" src="@item.Logo" />
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Description)</b><br />
+									@if (item.Description?.Count() > 200)
+									{
+										<text>@item.Description.Substring(0, 200)...</text>
+									}
+									else
+									{
+										<text>@item.Description</text>
+									}
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Category)</b><br />
+									@Html.DisplayFor(model => item.Category)
+								</p>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Website)</b><br />
+									@Html.DisplayFor(model => item.Website)
+								</p>
+							</td>
+							<td>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.ContactName)</b><br />
+									@Html.DisplayFor(model => item.ContactName)<br />
+								</p>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Email)</b><br />
+									@Html.DisplayFor(model => item.Email)<br />
+								</p>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Phone)</b>
+									@Html.DisplayFor(model => item.Phone)<br />
+								</p>
+								@if (item.DefinedTags.Count > 0)
+								{
+									<b>Segmentos</b>
+									@foreach (var tag in item.DefinedTags.Select(s => s.Tag).Where(w => w.Key.Equals("Segmento")))
+									{
+										<p>
+											@Html.DisplayFor(model => tag.Value)
+										</p>
+									}
+									<b>Tecnologias</b>
+									@foreach (var tag in item.DefinedTags.Select(s => s.Tag).Where(w => w.Key.Equals("Tecnologia")))
+									{
+										<p>
+											@Html.DisplayFor(model => tag.Value)
+										</p>
+									}
+								}
+							</td>
+							<td>@Html.DisplayFor(model => item.Tags)</td>
+							<td>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Address)</b><br />
+									@Html.DisplayFor(model => item.Address)<br />
+								</p>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Latitude)</b><br />
+									@Html.DisplayFor(model => item.Latitude)<br />
+								</p>
+								<p>
+									<b>@Html.DisplayNameFor(model => model.Longitude)</b><br />
+									@Html.DisplayFor(model => item.Longitude)
+								</p>
+							</td>
+							<td>@Html.DisplayFor(model => item.FoundationDate.Year)</td>
+							<td class="buttons" width="20%">
+								<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Editar</a><br />
+								<!-- <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Detalhes</a> -->
+								<a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" onclick="return confirm('Você tem certeza disso?');">Apagar</a><br />
+								@if (item.Activated)
+								{
+									<a asp-action="Deactivate" asp-route-id="@item.Id" class="btn btn-warning">Desativar</a>
+								}
+								else
+								{
+									<a asp-action="Activate" asp-route-id="@item.Id" class="btn btn-success">Ativar</a>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		else
+		{
+			<h1>Não há dados a serem exibidos</h1>
+		}
+	</div>
+	<div class="col-md-12">
+		<p class="text-center">
+			@if (total > 0)
+			{
+				var qry = query.Clone();
+				qry.Page = currentPage - 1;
+				<a class="btn btn-primary @(currentPage == 1 ? "disabled" : "")" href="@(Url.RouteUrl("Index") + qry.GetUrl())"><i class="glyphicon glyphicon-chevron-left"></i></a>
+				int count = 7;
+				@for (var x = 1; x < pageLimit + 1; x++)
+				{
+					qry = query.Clone();
+					qry.Page = x;
+					if (count == 0) { break; }
+					if (count == 4)
+					{
+						<a class="btn btn-primary">...</a>
+						x = (int)pageLimit - count + 1;
+						count--;
+						continue;
+					}
+					<a class="btn btn-primary @((currentPage == x) ? "active" : "")" href="@(Url.RouteUrl("Index") + qry.GetUrl())">@x</a>
+					count--;
+				}
+				qry = query.Clone();
+				qry.Page = currentPage + 1;
+				<a class="btn btn-primary @(currentPage == pageLimit ? "disabled" : "")" href="@(Url.RouteUrl("Index") + qry.GetUrl())"><i class="glyphicon glyphicon-chevron-right"></i></a>
+			}
+		</p>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		$(function ($) {
+			$(".clickable-row").click(function () {
+				window.location = $(this).data("href");
+			});
+			$('#selectOrder').val('@order');
+			$(document).on('change', '#selectOrder', function (e) {
+				location.assign('@Html.Raw(Url.RouteUrl("Index") + query.GetUrl(new string[] { "order" }))&order=' + this.value)
+			});
+			$('#selectSize').val('@query.Size');
+			$(document).on('change', '#selectSize', function (e) {
+				location.assign('@Html.Raw(Url.RouteUrl("Index") + query.GetUrl(new string[] { "size" }))&size=' + this.value)
+			});
+		});
+	</script>
+}

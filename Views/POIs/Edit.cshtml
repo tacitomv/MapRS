@@ -1,0 +1,146 @@
+@model Mapa.Models.POI
+
+@{
+	ViewData["Title"] = "Edit";
+}
+
+@section Head {
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.css" />
+}
+
+<h2>Editar POI</h2>
+<hr />
+<div class="row">
+	<div class="col-md-8 col-md-offset-2">
+		<form asp-action="Edit" enctype="multipart/form-data">
+			<input type="hidden" name="id" asp-for="Id" />
+			<input type="hidden" asp-for="Activated" />
+			<div class="row">
+				<div class="col">
+					<div class="form-group">
+						<input type="text" class="form-control" asp-for="Name" placeholder="Nome *" required>
+					</div>
+					<div class="form-group">
+						<select asp-for="Category" placeholder="Categoria *" required asp-items="@(ViewData["Categories"] as SelectList)"></select>
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control" asp-for="Website" placeholder="Website">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-8">
+					<div class="form-group">
+						<input type="text" class="form-control" asp-for="Address" id="autocomplete" placeholder="Endereço *" required>
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<div class="form-group">
+						<input asp-for="Latitude" class="form-control" />
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<div class="form-group">
+						<input asp-for="Longitude" class="form-control" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+
+					<div class="row">
+						<div class="col-md-4">
+							<div class="form-group">
+								<label asp-for="CreationDate"></label>
+								<input asp-for="CreationDate" class="form-control" />
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<label asp-for="ApprovalDate"></label>
+								<input asp-for="ApprovalDate" class="form-control" />
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<label asp-for="FoundationDate"></label>
+								<input asp-for="FoundationDate" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<select id="select-tags" placeholder="Tags" multiple></select>
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control cnpj" asp-for="CNPJ" placeholder="CNPJ">
+					</div>
+				</div>
+				<div class="col-md-12">
+					<div class="form-group">
+						<textarea rows="3" class="form-control" asp-for="Description" placeholder="Descrição *" required></textarea>
+					</div>
+				</div>
+				@if (Model.DefinedTags.Count > 0)
+				{
+					<div class="row">
+						<div class="col-md-6">
+							<b>Segmentos</b>
+							@foreach (var tag in Model.DefinedTags.Select(s => s.Tag).Where(w => w.Key.Equals("Segmento")))
+							{
+								<p>
+									@Html.DisplayFor(model => tag.Value)
+								</p>
+							}
+						</div>
+						<div class="col-md-6">
+							<b>Tecnologias</b>
+							@foreach (var tag in Model.DefinedTags.Select(s => s.Tag).Where(w => w.Key.Equals("Tecnologia")))
+							{
+								<p>
+									@Html.DisplayFor(model => tag.Value)
+								</p>
+							}
+						</div>
+					</div>
+				}
+			</div>
+			<h5>Sobre o Contato</h5>
+			<hr />
+			<div class="row">
+				<div class="col">
+					<div class="form-group">
+						<input type="text" class="form-control" asp-for="Phone" placeholder="Telefone">
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control" asp-for="ContactName" placeholder="Nome do Contato *" required>
+					</div>
+				</div>
+				<div class="col">
+					<div class="form-group">
+						<input type="email" class="form-control" asp-for="Email" placeholder="Email *" required>
+					</div>
+					<div class="form-group text-center">
+						@if (!string.IsNullOrEmpty(Model.Logo))
+						{
+							<img id="Logo" style="max-width: 200px;margin: 10px auto;" src="@Model.Logo" />
+						}
+						<input name="File" id="file" type="file" class="form-control" accept=".jpg, .jpeg, .png">
+					</div>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary">Enviar</button>
+			<a asp-action="Index" class="btn btn-secondary">Retornar</a>
+		</form>
+	</div>
+</div>
+
+@section scripts {
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
+	<script>
+		var tags = @(Html.Raw(ViewData["Tags"]));
+		var selectedTags = @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Tags)));
+	</script>
+	<script src="~/js/edit.js"></script>
+	<script src="~/js/googlePlaces.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRrvpNm6iSJ4-pym-S_fVGrn7dimj_yHg&libraries=places&callback=initAutocomplete" async defer></script>
+}

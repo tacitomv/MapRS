@@ -1,0 +1,66 @@
+﻿@model Tuple<List<Mapa.Models.Tag>, List<Mapa.Models.Tag>>
+
+@{
+	ViewData["Title"] = "Index";
+}
+
+<h2>Gerência de Tags</h2>
+<p>
+	<a asp-action="Create">Nova Tag</a>
+</p>
+<div class="row">
+	<div class="col-md-6">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>
+						Segmentos
+					</th>
+					<th>Ações</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model.Item1)
+				{
+					<tr>
+						<td>
+							@Html.DisplayFor(modelItem => item.Value)
+						</td>
+						<td>
+								<a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+								@*<a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |*@
+								<a asp-action="Delete" asp-route-id="@item.Id">Apagar</a>
+							</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	<div class="col-md-6">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>
+						Tecnologias
+					</th>
+					<th>Ações</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model.Item2)
+				{
+					<tr>
+						<td>
+							@Html.DisplayFor(modelItem => item.Value)
+						</td>
+						<td>
+								<a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+								@*<a asp-action="Details" asp-route-id="@item.Id">Details</a> |*@
+								<a asp-action="Delete" asp-route-id="@item.Id">Apagar</a>
+							</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>

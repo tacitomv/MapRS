@@ -1,0 +1,36 @@
+{
+  "name": "Mapa",
+  "version": "1.0.0",
+  "description": "Mapa AGS",
+  "main": "Startup.cs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node -e \"try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'wwwroot\\lib', 'junction') } catch (e) { }\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tacitomv/Mapagit"
+  },
+  "keywords": [
+    "mapa",
+    "ags"
+  ],
+  "author": "Tácito Viero",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tacitomv/Mapa/issues"
+  },
+  "homepage": "https://github.com/tacitomv/Mapa#readme",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-sass": "^3.1.0",
+    "@bower_components/bootstrap": "twbs/bootstrap#v3.3.7",
+    "@bower_components/jquery": "git://github.com/jquery/jquery-dist.git#2.2.0",
+    "@bower_components/jquery-validation": "git://github.com/jzaefferer/jquery-validation.git#>=1.8",
+    "@bower_components/jquery-validation-unobtrusive": "git://github.com/aspnet/jquery-validation-unobtrusive.git#3.2.6"
+  },
+  "engines": {
+    "yarn": ">= 1.0.0"
+  }
+}

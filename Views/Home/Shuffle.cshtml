@@ -1,0 +1,148 @@
+@{
+    ViewData["Title"] = "Startups AGS";
+    Layout = "~/Views/Shared/_HeaderlessLayout.cshtml";
+}
+
+@section head {
+    <style>
+        @@media (max-width: 575px) {
+            .row > [class*="col-"] {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+        }
+    </style>
+}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <form class="form-inline">
+        <input class="form-control mr-sm-2" type="search" id="shuffle-search" placeholder="Buscar...">
+    </form>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/">Mapa</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#numbers">Números</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row text-center">
+        <div class="col-md-12" style="overflow-x:auto">
+            <div class="btn-group" data-toggle="buttons" id="Categories">
+                <!-- <label class="btn btn-outline-primary active">
+                    <input type="radio" name="shuffle-filter" value="all" checked>Todas
+                </label>
+                <label class="btn btn-outline-primary active">
+                <input type="radio" name="shuffle-filter" value="Startups">Startups
+                </label>
+                <label class="btn btn-outline-primary">
+                <input type="radio" name="shuffle-filter" value="Recursos">Recursos
+                </label>
+                <label class="btn btn-outline-primary">
+                <input type="radio" name="shuffle-filter" value="Empresas">Empresas
+                </label> -->
+            </div>
+        </div>
+    </div>
+    <div id="grid" class="my-shuffle-container row shuffle">
+        <!-- <div class="grid__brick mt-3 col-6 col-md-4 col-xl-3 shuffle-item shuffle-item--visible">
+            <div class="card card-info card-inverse">
+                <div class="card-block">
+                    Return on investment product management equity crowdfunding stock pivot innovator sales ownership.
+                </div>
+            </div>
+        </div> -->
+    </div>
+    <a href="#" data-toggle="modal" data-target="#about">Sobre</a>
+</div>
+
+@section scripts {
+    <script src="https://unpkg.com/shufflejs@5.0.2/dist/shuffle.js"></script>
+    <script>
+        var Shuffle = window.Shuffle;
+        var lugares = @Html.Raw(ViewData["Places"]);
+        var categorias = @Html.Raw(ViewData["Categories"]);
+
+        _catClick = function (evt) {
+            var input = evt.currentTarget.children[0];
+            //if (input.checked) {
+                myShuffle.filter(input.value);
+            //}
+            location.hash = '#' + input.value;
+        }
+
+        var $cat = $(`<label class="btn btn-outline-primary active">
+                        <input type="radio" name="shuffle-filter" value="all" checked>Todas
+                    </label>`);
+        $('#Categories').append($cat);
+        $cat.on('click', _catClick);
+
+        categorias.forEach(function(cat){
+            var $cat = $(`<label class="btn btn-outline-primary">
+                            <input type="radio" name="shuffle-filter" value="${cat}">${cat}
+                        </label>`);
+            $('#Categories').append($cat);
+            $cat.on('click', _catClick);
+        }, this);
+
+        lugares.forEach(function(element) {
+            $('#grid').append(
+                `<div class="grid__brick mt-3 col-3 col-md-3 col-xl-3 shuffle-item shuffle-item--visible" data-groups='["${element.Category}"]'>
+                    <div class="card">
+                        ${
+                            (element.Logo !== null && element.Logo !== '') ? 
+                            '<div class="card-img-top"><div class="text-center"><img class="w-100" src="' + element.Logo + '" /></div></div>' : ''
+                        }
+                        <div class="card-body">
+                            <h4 class="card-title">${element.Name}</h4>
+                            <h6 class="card-subtitle mb-2 text-muted">${element.Category}</h6>
+                            <p class="card-text">
+                                ${(element.Description ? "<b>Descrição:</b> " + element.Description : "" )}
+                                ${(element.Tags ? "<br><b>Tags:</b> " + element.Tags : "" )}
+                                <br><b>Endereço:</b> ${element.Address}
+                                ${(element.Website ? '<br><b>Site:</b> <a target="_blank" href="' + element.Website + '">' + element.Website + '</a>' : "")}
+                                ${(element.ContactName ? "<br><b>Contato:</b> " + element.ContactName : "")}
+                                ${(element.Phone ? "<br><b>Telefone:</b> " + element.Phone : "")}
+                                ${(element.Email ? '<br><b>E-mail:</b> <a href="mailto:' + element.Email + '">' + element.Email + '</a>' : "")}
+                            </p>
+                        </div>
+                    </div>
+                </div>`);
+        }, this);
+        $('#grid').append('<div class="col-1 my-sizer-element"></div>');
+
+        var myShuffle = new Shuffle(document.getElementById('grid'), {
+            itemSelector: '.grid__brick',
+            sizer: '.my-sizer-element',
+        });
+
+        $(function(){
+            if(location.hash){
+                var place = location.hash.split('#')[1];
+                $('input[name="shuffle-filter"][value="' + place + '"]').click();
+            }
+        });
+
+        _handleSearchKeyup = function (evt) {
+            var searchText = evt.target.value.toLowerCase();
+
+            myShuffle.filter(function (element, shuffle) {
+                var titleElement = element.querySelector('.card-title');
+                var titleText = titleElement.textContent.toLowerCase().trim();
+
+                return titleText.indexOf(searchText) !== -1;
+            });
+        };
+        document.getElementById('shuffle-search').addEventListener('keyup', _handleSearchKeyup.bind(this));
+
+        myShuffle.update();
+    </script>
+}

@@ -1,0 +1,40 @@
+.body-content {
+    padding-top: 60px;
+}
+
+.pac-container {
+    background-color: #FFF;
+    z-index: 20;
+    position: fixed;
+    display: inline-block;
+    float: left;
+}
+.modal {
+    z-index: 20;
+}
+.modal-backdrop {
+    z-index: 10;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.card-img-top {
+    padding: 20px;
+}
+
+button, input[type="submit"], input[type="button"] {
+    cursor: pointer;
+}
+
+.selectize-input {
+	padding: 9px 8px !important;
+}
+
+input[name="File"] {
+	padding: 4px 0;
+}
+
+.hidden {
+	display: none;
+}
+
+@import "index";
