@@ -101,7 +101,7 @@ namespace Mapa.Controllers
 				AddDefinedTag(poiVM.Tecnologies, poi);
 				await CreateImageAsync(poi);
 
-				_context.Add(poi);
+				_context.POIs.Add(poi);
 				await _context.SaveChangesAsync();
 				return Json(new { status = "OK" });
 			}
@@ -319,7 +319,14 @@ namespace Mapa.Controllers
 				var fileTempPath = Path.GetTempFileName();
 				var extension = Path.GetExtension(file.FileName);
                 var fileName = Guid.NewGuid().ToString("N") + extension;
-				var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatar", fileName);
+
+                string directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatar");
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                var filePath = Path.Combine(directory, fileName);
 
 				using (var stream = new FileStream(filePath, FileMode.Create))
 				{

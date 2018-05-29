@@ -15,8 +15,10 @@ namespace Mapa.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			// shadow properties
-			modelBuilder.Entity<POI>().Property<DateTime>("UpdatedTimestamp");
+            modelBuilder.HasDefaultSchema("traustit_MAPAGS_User");
+
+            // shadow properties
+            modelBuilder.Entity<POI>().Property<DateTime>("UpdatedTimestamp");
 
 			base.OnModelCreating(modelBuilder);
 
