@@ -53,7 +53,7 @@ namespace Mapa
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 
-			services.AddMvc(config =>
+            services.AddMvc(config =>
 				{
 					config.ModelBinderProviders.Insert(0, new InvariantDecimalModelBinderProvider());
 				});

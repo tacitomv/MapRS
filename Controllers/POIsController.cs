@@ -16,6 +16,7 @@ using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using System.Threading;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Mapa.Controllers
 {
@@ -337,11 +338,22 @@ namespace Mapa.Controllers
 			}
 		}
 
-        public JsonResult Emails(bool withOwner)
+        [AllowAnonymous]
+        public JsonResult Emails(bool withOwner = false, bool full = false)
         {
+            if (full)
+            {
+                var pois = _context.POIs.ToList();
+                return Json(pois);
+            }
             if (withOwner)
             {
-                var pois = _context.POIs.Select(x => new { x.Name, x.Email }).ToList();
+                var pois = _context.POIs.Select(x => new {
+                    name = x.ContactName,
+                    email = x.Email,
+                    company_name = x.Name,
+                    origin = "ags_map"
+                }).ToList();
                 return Json(pois);
             }
             var poiEmails = _context.POIs.Select(x => x.Email).ToList().Concat(_context.Users.Select(x => x.Email).ToList());
