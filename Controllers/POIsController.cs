@@ -336,5 +336,12 @@ namespace Mapa.Controllers
 				poi.Logo = Path.Combine("avatar", fileName);
 			}
 		}
+
+        public JsonResult Emails()
+        {
+            var poiEmails = _context.POIs.Select(x => x.Email).ToList().Concat(_context.Users.Select(x => x.Email).ToList());
+            poiEmails.Distinct();
+            return Json(poiEmails);
+        }
     }
 }
