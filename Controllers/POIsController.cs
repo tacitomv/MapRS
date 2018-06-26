@@ -337,8 +337,13 @@ namespace Mapa.Controllers
 			}
 		}
 
-        public JsonResult Emails()
+        public JsonResult Emails(bool withOwner)
         {
+            if (withOwner)
+            {
+                var pois = _context.POIs.Select(x => new { x.Name, x.Email }).ToList();
+                return Json(pois);
+            }
             var poiEmails = _context.POIs.Select(x => x.Email).ToList().Concat(_context.Users.Select(x => x.Email).ToList());
             poiEmails.Distinct();
             return Json(poiEmails);
