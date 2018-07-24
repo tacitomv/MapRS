@@ -14,6 +14,10 @@ using Mapa.Extensions;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using AutoMapper;
+using Mapa.Services;
+using Amazon.S3;
+using Amazon.Runtime;
+using Amazon;
 
 namespace Mapa
 {
@@ -57,8 +61,14 @@ namespace Mapa
 				{
 					config.ModelBinderProviders.Insert(0, new InvariantDecimalModelBinderProvider());
 				});
+            services.AddSingleton<IS3Service, S3Service>();
+            services.AddAWSService<IAmazonS3>(options: new Amazon.Extensions.NETCore.Setup.AWSOptions()
+            {
+                Credentials = new Credentials(Configuration),
+                Region = RegionEndpoint.SAEast1
+            });
 
-			Mapper.Initialize(cfg => cfg.CreateMap<POIViewModel, POI>());
+            Mapper.Initialize(cfg => cfg.CreateMap<POIViewModel, POI>());
 
 			// Add application services.
 			services.AddTransient<IEmailSender, AuthMessageSender>();
@@ -123,5 +133,22 @@ namespace Mapa
 						template: "{controller=Home}/{action=Index}/{id?}");
 			});
 		}
-	}
+
+        internal class Credentials : AWSCredentials
+        {
+            private string AwsAccessKeyId { get; set; }
+            public string AwsSecretAccessKey { get; set; }
+
+            public Credentials(IConfigurationRoot configuration)
+            {
+                AwsAccessKeyId = configuration.GetSection("AWS")["awsAccessKeyId"];
+                AwsSecretAccessKey = configuration.GetSection("AWS")["awsSecretAccessKey"];
+            }
+
+            public override ImmutableCredentials GetCredentials()
+            {
+                return new ImmutableCredentials(AwsAccessKeyId, AwsSecretAccessKey, null);
+            }
+        }
+    }
 }

@@ -17,6 +17,7 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using System.Threading;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Mapa.Services;
 
 namespace Mapa.Controllers
 {
@@ -24,10 +25,12 @@ namespace Mapa.Controllers
     public class POIsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IS3Service _amazonUpload;
 
-        public POIsController(ApplicationDbContext context)
+        public POIsController(ApplicationDbContext context, IS3Service service)
         {
             _context = context;
+            _amazonUpload = service;
         }
 
         public async Task<ActionResult> SheetImport(CancellationToken cancellationToken)
@@ -321,20 +324,32 @@ namespace Mapa.Controllers
 				var extension = Path.GetExtension(file.FileName);
                 var fileName = Guid.NewGuid().ToString("N") + extension;
 
-                string directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatar");
-                if (!Directory.Exists(directory))
+                //            string directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatar");
+                //            if (!Directory.Exists(directory))
+                //            {
+                //                Directory.CreateDirectory(directory);
+                //            }
+
+                //            var filePath = Path.Combine(directory, fileName);
+
+                //using (var stream = new FileStream(filePath, FileMode.Create))
+                //{
+                //	await file.CopyToAsync(stream);
+                //}
+                MemoryStream stream = new MemoryStream();
+                file.CopyTo(stream);
+                string bucket = "mapaagsrs";
+                string filePath = "Avatar/" + fileName;
+                var res = await _amazonUpload.UploadFile(stream, filePath, bucket);
+                if (res.Status == System.Net.HttpStatusCode.OK)
                 {
-                    Directory.CreateDirectory(directory);
+                    filePath = " https://s3-sa-east-1.amazonaws.com/" + bucket + "/" + filePath;
+                    poi.Logo = filePath;
                 }
-
-                var filePath = Path.Combine(directory, fileName);
-
-				using (var stream = new FileStream(filePath, FileMode.Create))
-				{
-					await file.CopyToAsync(stream);
-				}
-                
-				poi.Logo = Path.Combine("avatar", fileName);
+                else
+                {
+                    Console.WriteLine(res.Message);
+                }
 			}
 		}
 
