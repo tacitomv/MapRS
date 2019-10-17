@@ -317,6 +317,8 @@ namespace Mapa.Controllers
 
         private async Task CreateImageAsync(POI poi)
 		{
+            if(Request.Form.Files.Count <= 0) return;
+
 			var file = Request.Form.Files[0];
 			if (file?.Length > 0)
 			{
